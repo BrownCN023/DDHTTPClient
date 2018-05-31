@@ -20,4 +20,6 @@ s.source_files =  "DDHTTPClient/*.{h,m}"
 s.requires_arc = true
 s.frameworks = "Foundation"
 
+s.dependency "AFNetworking"
+
 end
