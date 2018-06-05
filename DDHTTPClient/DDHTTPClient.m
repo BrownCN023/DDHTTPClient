@@ -132,23 +132,23 @@
 }
 
 - (NSURLSessionDataTask *)head{
-    AFHTTPSessionManager * manager = [DDHTTPClient httpManager];
+    AFHTTPSessionManager * manager = [[self class] httpManager];
     return [DDHTTPClient taskWithMethod:DDHTTPMethodHead manager:manager url:self.httpUrl headers:self.httpHeader params:self.httpParams progress:self.httpProgress success:self.httpSuccess failure:self.httpFailure];
 }
 - (NSURLSessionDataTask *)get{
-    AFHTTPSessionManager * manager = [DDHTTPClient httpManager];
+    AFHTTPSessionManager * manager = [[self class] httpManager];
     return [DDHTTPClient taskWithMethod:DDHTTPMethodGet manager:manager url:self.httpUrl headers:self.httpHeader params:self.httpParams progress:self.httpProgress success:self.httpSuccess failure:self.httpFailure];
 }
 - (NSURLSessionDataTask *)post{
-    AFHTTPSessionManager * manager = [DDHTTPClient httpManager];
+    AFHTTPSessionManager * manager = [[self class] httpManager];
     return [DDHTTPClient taskWithMethod:DDHTTPMethodPost manager:manager url:self.httpUrl headers:self.httpHeader params:self.httpParams progress:self.httpProgress success:self.httpSuccess failure:self.httpFailure];
 }
 - (NSURLSessionDataTask *)upload{
-    AFHTTPSessionManager * manager = [DDHTTPClient httpManager];
+    AFHTTPSessionManager * manager = [[self class] httpManager];
     return [DDHTTPClient uploadWithManager:manager url:self.httpUrl headers:self.httpHeader params:self.httpParams uploadfiles:self.httpUploadFiles progress:self.httpProgress success:self.httpSuccess failure:self.httpFailure];
 }
 - (NSURLSessionDownloadTask *)download{
-    AFHTTPSessionManager * manager = [DDHTTPClient httpManager];
+    AFHTTPSessionManager * manager = [[self class] httpManager];
     return [DDHTTPClient downloadWithManager:manager url:self.httpUrl headers:self.httpHeader destination:self.httpDownloadDestination completion:self.httpDownloadCompletion progress:self.httpProgress];
 }
 
