@@ -7,8 +7,11 @@
 //
 
 #import "ViewController.h"
+#import "SimpleHttpApiManager.h"
 
-@interface ViewController ()
+@interface ViewController ()<DDHttpApiManagerDelegate>
+
+@property (nonatomic,strong) SimpleHttpApiManager * apiManager;
 
 @end
 
@@ -17,6 +20,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    self.apiManager = [[SimpleHttpApiManager alloc] init];
+    self.apiManager.delegate = self;
+    
+    //...
+    //[self.apiManager get];
+    [self.apiManager post];
 }
 
 
@@ -25,5 +34,12 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - DDHttpApiManagerDelegate
+- (void)apiManagerDidSuccess:(DDHttpApiManager *)manager{
+    
+}
+- (void)apiManagerFailed:(DDHttpApiManager *)manager error:(NSError *)error{
+    
+}
 
 @end
