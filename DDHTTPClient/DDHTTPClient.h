@@ -1,7 +1,7 @@
 //
 //  DDHTTPClient.h
 //  DDToolboxExample
-//  
+//
 //  Created by brown on 2018/5/10.
 //  Copyright © 2018年 ABiang. All rights reserved.
 //
@@ -40,19 +40,19 @@ typedef void (^DDHTTPFailureCallback)(NSError * error);
 typedef NSURL * (^DDHTTPDownloadDestination)(NSURL * targetPath, NSURLResponse * response);
 typedef void (^DDHTTPDownloadCompletion)(NSURLResponse * response, NSURL * filePath, NSError * error);
 
-@class DDHTTPRequest;
-typedef DDHTTPRequest *(^DDHTTPRequestURL)(NSString * url);
-typedef DDHTTPRequest *(^DDHTTPRequestHeader)(NSDictionary * header);
-typedef DDHTTPRequest *(^DDHTTPRequestParams)(NSDictionary * params);
-typedef DDHTTPRequest *(^DDHTTPRequestUploadFile)(NSArray<DDHTTPUploadModel *> * files);
-typedef DDHTTPRequest *(^DDHTTPRequestDownloadDestination)(DDHTTPDownloadDestination callback);
-typedef DDHTTPRequest *(^DDHTTPRequestDownloadCompletion)(DDHTTPDownloadCompletion callback);
-typedef DDHTTPRequest *(^DDHTTPRequestProgress)(DDHTTPProgressCallback callback);
-typedef DDHTTPRequest *(^DDHTTPRequestSuccess)(DDHTTPSuccessCallback callback);
-typedef DDHTTPRequest *(^DDHTTPRequestFailure)(DDHTTPFailureCallback callback);
+@class DDHTTPClient;
+typedef DDHTTPClient *(^DDHTTPRequestURL)(NSString * url);
+typedef DDHTTPClient *(^DDHTTPRequestHeader)(NSDictionary * header);
+typedef DDHTTPClient *(^DDHTTPRequestParams)(NSDictionary * params);
+typedef DDHTTPClient *(^DDHTTPRequestUploadFile)(NSArray<DDHTTPUploadModel *> * files);
+typedef DDHTTPClient *(^DDHTTPRequestDownloadDestination)(DDHTTPDownloadDestination callback);
+typedef DDHTTPClient *(^DDHTTPRequestDownloadCompletion)(DDHTTPDownloadCompletion callback);
+typedef DDHTTPClient *(^DDHTTPRequestProgress)(DDHTTPProgressCallback callback);
+typedef DDHTTPClient *(^DDHTTPRequestSuccess)(DDHTTPSuccessCallback callback);
+typedef DDHTTPClient *(^DDHTTPRequestFailure)(DDHTTPFailureCallback callback);
 
 
-@interface DDHTTPRequest : NSObject
+@interface DDHTTPClient : NSObject
 
 @property (nonatomic,strong,readonly) DDHTTPRequestURL url;
 @property (nonatomic,strong,readonly) DDHTTPRequestHeader header;
@@ -64,7 +64,7 @@ typedef DDHTTPRequest *(^DDHTTPRequestFailure)(DDHTTPFailureCallback callback);
 @property (nonatomic,strong,readonly) DDHTTPRequestSuccess success;
 @property (nonatomic,strong,readonly) DDHTTPRequestFailure failure;
 
-+ (AFHTTPSessionManager *)httpManager;
++ (AFHTTPSessionManager *)httpManager:(void (^)(AFHTTPSessionManager * manager))config;
 + (void)configSerializer:(AFHTTPSessionManager *)manager;
 
 - (NSURLSessionDataTask *)head;
@@ -73,15 +73,13 @@ typedef DDHTTPRequest *(^DDHTTPRequestFailure)(DDHTTPFailureCallback callback);
 - (NSURLSessionDataTask *)upload;
 - (NSURLSessionDownloadTask *)download;
 
-@end
 
-@interface DDHTTPClient : NSObject
-
-+ (DDHTTPRequest *)createRequest;
++ (DDHTTPClient *)createClient;
 
 @end
 
 /**
-    eg:
-    [DDHTTPClient.createRequest.url(@"http://120.12.12.12:8080/demo/api").params(@{@"username":@"admin",@"password":@"123"}) get];
-*/
+ eg:
+ [DDHTTPClient.createRequest.url(@"http://120.12.12.12:8080/demo/api").params(@{@"username":@"admin",@"password":@"123"}) get];
+ */
+

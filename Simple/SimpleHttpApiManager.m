@@ -17,11 +17,6 @@
 - (NSString *)apiPrefix{
     return @"studentApp";
 }
-
-#pragma mark - Override
-- (Class)clientClass{
-    return SimpleHTTPClient.class;
-}
 - (NSString *)apiHost{
     return @"192.168.12.1";
 }
@@ -31,6 +26,12 @@
 - (NSString *)apiPath{
     return @"login";
 }
+
+#pragma mark - Override
+- (Class)clientClass{
+    return SimpleHTTPClient.class;
+}
+
 - (NSString *)apiURL{
     NSString * url = [NSString stringWithFormat:@"%@:%@/%@/%@/%@",self.apiHost,self.apiPort,self.apiPrefix,self.apiVersin,self.apiPath];
     return url;

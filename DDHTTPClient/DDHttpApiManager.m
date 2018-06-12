@@ -31,27 +31,16 @@
     return self;
 }
 
-- (NSString *)apiHost{
-    return nil;
-}
-- (NSString *)apiPort{
-    return @"80";
-}
-- (NSString *)apiPath{
-    return nil;
-}
 - (NSDictionary *)apiHeader{
     return nil;
 }
+
 - (NSDictionary *)apiParams{
     return nil;
 }
+
 - (NSString *)apiURL{
-    NSString * host = self.child.apiHost;
-    NSString * port = self.child.apiPort;
-    NSString * path = self.child.apiPath;
-    NSString * url = [NSString stringWithFormat:@"%@:%@/%@",host,port,path];
-    return url;
+    return nil;
 }
 
 - (Class)clientClass{
@@ -97,9 +86,11 @@
 - (void)get{
     self.task = [[self createHTTPClient] get];
 }
+
 - (void)post{
     self.task = [[self createHTTPClient] post];
 }
+
 - (void)cancel{
     if(self.task){
         [self.task cancel];

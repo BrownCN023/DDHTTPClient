@@ -35,8 +35,9 @@
 
 @end
 
-#pragma mark - DDHTTPRequest
-@interface DDHTTPRequest()
+#pragma mark - DDHTTPClient
+
+@interface DDHTTPClient()
 
 @property (nonatomic,copy) NSString * httpUrl;
 @property (nonatomic,strong) NSDictionary * httpHeader;
@@ -50,12 +51,13 @@
 
 @end
 
-@implementation DDHTTPRequest
+#pragma mark - DDHTTPClient
+@implementation DDHTTPClient
 
 - (void)dealloc{
-    #ifdef DEBUG
+#ifdef DEBUG
     NSLog(@"---- dealloc %@ ----",[self class]);
-    #endif
+#endif
 }
 
 - (instancetype)init{
@@ -130,42 +132,49 @@
 }
 
 - (NSURLSessionDataTask *)head{
-    AFHTTPSessionManager * manager = [DDHTTPRequest httpManager];
-    return [DDHTTPRequest taskWithMethod:DDHTTPMethodHead manager:manager url:self.httpUrl headers:self.httpHeader params:self.httpParams progress:self.httpProgress success:self.httpSuccess failure:self.httpFailure];
+    AFHTTPSessionManager * manager = [[self class] httpManager];
+    return [DDHTTPClient taskWithMethod:DDHTTPMethodHead manager:manager url:self.httpUrl headers:self.httpHeader params:self.httpParams progress:self.httpProgress success:self.httpSuccess failure:self.httpFailure];
 }
 - (NSURLSessionDataTask *)get{
-    AFHTTPSessionManager * manager = [DDHTTPRequest httpManager];
-    return [DDHTTPRequest taskWithMethod:DDHTTPMethodGet manager:manager url:self.httpUrl headers:self.httpHeader params:self.httpParams progress:self.httpProgress success:self.httpSuccess failure:self.httpFailure];
+    AFHTTPSessionManager * manager = [[self class] httpManager];
+    return [DDHTTPClient taskWithMethod:DDHTTPMethodGet manager:manager url:self.httpUrl headers:self.httpHeader params:self.httpParams progress:self.httpProgress success:self.httpSuccess failure:self.httpFailure];
 }
 - (NSURLSessionDataTask *)post{
-    AFHTTPSessionManager * manager = [DDHTTPRequest httpManager];
-    return [DDHTTPRequest taskWithMethod:DDHTTPMethodPost manager:manager url:self.httpUrl headers:self.httpHeader params:self.httpParams progress:self.httpProgress success:self.httpSuccess failure:self.httpFailure];
+    AFHTTPSessionManager * manager = [[self class] httpManager];
+    return [DDHTTPClient taskWithMethod:DDHTTPMethodPost manager:manager url:self.httpUrl headers:self.httpHeader params:self.httpParams progress:self.httpProgress success:self.httpSuccess failure:self.httpFailure];
 }
 - (NSURLSessionDataTask *)upload{
-    AFHTTPSessionManager * manager = [DDHTTPRequest httpManager];
-    return [DDHTTPRequest uploadWithManager:manager url:self.httpUrl headers:self.httpHeader params:self.httpParams uploadfiles:self.httpUploadFiles progress:self.httpProgress success:self.httpSuccess failure:self.httpFailure];
+    AFHTTPSessionManager * manager = [[self class] httpManager];
+    return [DDHTTPClient uploadWithManager:manager url:self.httpUrl headers:self.httpHeader params:self.httpParams uploadfiles:self.httpUploadFiles progress:self.httpProgress success:self.httpSuccess failure:self.httpFailure];
 }
 - (NSURLSessionDownloadTask *)download{
-    AFHTTPSessionManager * manager = [DDHTTPRequest httpManager];
-    return [DDHTTPRequest downloadWithManager:manager url:self.httpUrl headers:self.httpHeader destination:self.httpDownloadDestination completion:self.httpDownloadCompletion progress:self.httpProgress];
+    AFHTTPSessionManager * manager = [[self class] httpManager];
+    return [DDHTTPClient downloadWithManager:manager url:self.httpUrl headers:self.httpHeader destination:self.httpDownloadDestination completion:self.httpDownloadCompletion progress:self.httpProgress];
 }
 
 #pragma mark - AFN
-+ (AFHTTPSessionManager *)httpManager{
++ (AFHTTPSessionManager *)httpManager:(void (^)(AFHTTPSessionManager * manager))config{
     static AFHTTPSessionManager * manager = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         manager = [AFHTTPSessionManager manager];
-        [self configSerializer:manager];
+        if(config){
+            config(manager);
+        }
     });
     return manager;
+}
++ (AFHTTPSessionManager *)httpManager{
+    return [self httpManager:^(AFHTTPSessionManager *manager) {
+        [self configSerializer:manager];
+    }];
 }
 
 + (void)configSerializer:(AFHTTPSessionManager *)manager{
     manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-//    manager.requestSerializer = [AFJSONRequestSerializer serializer];
+    //    manager.requestSerializer = [AFJSONRequestSerializer serializer];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-//    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    //    manager.responseSerializer = [AFJSONResponseSerializer serializer];
     manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:
                                                          @"text/html",
                                                          @"text/xml",
@@ -177,32 +186,32 @@
 }
 
 + (NSURLSessionDownloadTask *)downloadWithManager:(AFHTTPSessionManager *)manager
-                                                url:(NSString *)url
-                                            headers:(NSDictionary *)headers
-                                        destination:(DDHTTPDownloadDestination)destination
-                                         completion:(DDHTTPDownloadCompletion)completion
-                                           progress:(DDHTTPProgressCallback)progress{
+                                              url:(NSString *)url
+                                          headers:(NSDictionary *)headers
+                                      destination:(DDHTTPDownloadDestination)destination
+                                       completion:(DDHTTPDownloadCompletion)completion
+                                         progress:(DDHTTPProgressCallback)progress{
     [headers enumerateKeysAndObjectsUsingBlock:^(NSString *  _Nonnull key, NSString *  _Nonnull obj, BOOL * _Nonnull stop) {
         [manager.requestSerializer setValue:obj forHTTPHeaderField:key];
     }];
     
     NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
     NSURLSessionDownloadTask * download = [manager downloadTaskWithRequest:request
-                                                                 progress:progress
-                                                              destination:destination
-                                                        completionHandler:completion];
+                                                                  progress:progress
+                                                               destination:destination
+                                                         completionHandler:completion];
     [download resume];
     return download;
 }
 
 + (NSURLSessionDataTask *)uploadWithManager:(AFHTTPSessionManager *)manager
-                   url:(NSString *)url
-               headers:(NSDictionary *)headers
-                params:(NSDictionary *)params
-           uploadfiles:(NSArray<DDHTTPUploadModel *> *)uploadFiles
-              progress:(DDHTTPProgressCallback)progress
-               success:(DDHTTPSuccessCallback)success
-               failure:(DDHTTPFailureCallback)failure{
+                                        url:(NSString *)url
+                                    headers:(NSDictionary *)headers
+                                     params:(NSDictionary *)params
+                                uploadfiles:(NSArray<DDHTTPUploadModel *> *)uploadFiles
+                                   progress:(DDHTTPProgressCallback)progress
+                                    success:(DDHTTPSuccessCallback)success
+                                    failure:(DDHTTPFailureCallback)failure{
     [headers enumerateKeysAndObjectsUsingBlock:^(NSString *  _Nonnull key, NSString *  _Nonnull obj, BOOL * _Nonnull stop) {
         [manager.requestSerializer setValue:obj forHTTPHeaderField:key];
     }];
@@ -306,13 +315,9 @@
     return nil;
 }
 
-@end
-
-#pragma mark - DDHTTPClient
-@implementation DDHTTPClient
-
-+ (DDHTTPRequest *)createRequest{
-    return [DDHTTPRequest new];
++ (DDHTTPClient *)createClient{
+    return [[[self class] alloc] init];
 }
 
 @end
+

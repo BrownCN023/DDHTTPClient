@@ -19,11 +19,8 @@
 
 @protocol DDHttpApiManagerDataSource <NSObject>
 @required
-- (NSString *)apiHost;
-- (NSString *)apiPort;
-- (NSString *)apiPath;
-@optional
 - (NSString *)apiURL;
+@optional
 - (NSDictionary *)apiHeader;
 - (NSDictionary *)apiParams;
 @end

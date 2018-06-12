@@ -16,6 +16,9 @@
 
 @interface SimpleHttpApiManager : DDHttpApiManager<DDHttpApiManagerDataSource>
 
+- (NSString *)apiHost;
+- (NSString *)apiPort;
+- (NSString *)apiPath;
 - (NSString *)apiVersin;
 - (NSString *)apiPrefix;
 
