@@ -7,7 +7,7 @@
 //
 
 #import "DDHTTPReachabilityManager.h"
-#import "AFNetworking.h"
+#import <AFNetworking/AFNetworking.h>
 
 @interface DDHTTPReachabilityManager(){
     NSHashTable * _delegates;
@@ -46,24 +46,34 @@
     [_manager setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
         switch (status) {
                 case AFNetworkReachabilityStatusUnknown:{
+                    #ifdef DEBUG
                     NSLog(@"🍄🍄🍄网络状态:未知");
+                    #endif
                 }
                 break;
                 case AFNetworkReachabilityStatusNotReachable:{
+                    #ifdef DEBUG
                     NSLog(@"🍄🍄🍄网络状态:不可用");
+                    #endif
                 }
                 break;
                 case AFNetworkReachabilityStatusReachableViaWWAN:{
+                    #ifdef DEBUG
                     NSLog(@"🍄🍄🍄网络状态:2G/3G/4G/5G");
+                    #endif
                 }
                 break;
                 case AFNetworkReachabilityStatusReachableViaWiFi:{
+                    #ifdef DEBUG
                     NSLog(@"🍄🍄🍄网络状态:WIFI");
+                    #endif
                 }
                 break;
                 
             default:{
+                #ifdef DEBUG
                 NSLog(@"🍄🍄🍄网络状态:Other");
+                #endif
             }
                 break;
         }
