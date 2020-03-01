@@ -1,5 +1,5 @@
 //
-//  DDHttpApiManager.h
+//  DDHTTPApiManager.h
 //  DDToolboxExample
 //
 //  Created by brown on 2018/6/7.
@@ -10,14 +10,14 @@
 #import <Foundation/Foundation.h>
 #import "DDHTTPClient.h"
 
-@class DDHttpApiManager;
+@class DDHTTPApiManager;
 
 @protocol DDHttpApiReformerProtocol <NSObject>
 @required
-- (NSDictionary *)reformDataWithManager:(DDHttpApiManager *)manager;
+- (NSDictionary *)reformDataWithManager:(DDHTTPApiManager *)manager;
 @end
 
-@protocol DDHttpApiManagerDataSource <NSObject>
+@protocol DDHTTPApiManagerDataSource <NSObject>
 @required
 - (NSString *)apiURL;
 @optional
@@ -25,22 +25,21 @@
 - (NSDictionary *)apiParams;
 @end
 
-@protocol DDHttpApiManagerDelegate <NSObject>
+@protocol DDHTTPApiManagerDelegate <NSObject>
 @optional
-- (void)apiManagerDidSuccess:(DDHttpApiManager *)manager;
-- (void)apiManagerFailed:(DDHttpApiManager *)manager error:(NSError *)error;
+- (void)apiManagerDidSuccess:(DDHTTPApiManager *)manager;
+- (void)apiManagerFailed:(DDHTTPApiManager *)manager error:(NSError *)error;
 @end
 
-@interface DDHttpApiManager : NSObject
+@interface DDHTTPApiManager : NSObject
 
 @property (nonatomic,assign) NSInteger code;
 @property (nonatomic,copy) NSString * msg;
 @property (nonatomic,strong) id data;
 
 @property (nonatomic, weak, readonly) NSURLSessionDataTask * task;
-@property (nonatomic,weak) id<DDHttpApiManagerDelegate> delegate;
+@property (nonatomic,weak) id<DDHTTPApiManagerDelegate> delegate;
 
-- (Class)clientClass; //DDHTTPClient 或者其子类
 - (NSDictionary *)fetchDataWithReformer:(id<DDHttpApiReformerProtocol>)reformer;
 - (void)responseReformer:(id)response;
 - (void)get;

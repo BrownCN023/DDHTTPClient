@@ -7,7 +7,6 @@
 //
 
 #import "SimpleHttpApiManager.h"
-#import "SimpleHTTPClient.h"
 
 @implementation SimpleHttpApiManager
 
@@ -28,10 +27,6 @@
 }
 
 #pragma mark - Override
-- (Class)clientClass{
-    return SimpleHTTPClient.class;
-}
-
 - (NSString *)apiURL{
     NSString * url = [NSString stringWithFormat:@"%@:%@/%@/%@/%@",self.apiHost,self.apiPort,self.apiPrefix,self.apiVersin,self.apiPath];
     return url;

@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		53B4E677240BED9D0060B436 /* DDHTTPApiManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B4E676240BED9D0060B436 /* DDHTTPApiManager.m */; };
+		53B4E67E240BF02B0060B436 /* SimpleHttpApiManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B4E67C240BF02B0060B436 /* SimpleHttpApiManager.m */; };
+		53B4E681240BFA000060B436 /* DDHTTPReachabilityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 53B4E680240BFA000060B436 /* DDHTTPReachabilityManager.m */; };
 		AE7AB0BA4421639B736B6D67 /* libPods-DDHTTPClientDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 963C5F50790D67FF64C559BF /* libPods-DDHTTPClientDemo.a */; };
-		B28442B220CFA0C700862731 /* DDHttpApiManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B28442B120CFA0C700862731 /* DDHttpApiManager.m */; };
-		B28442B620CFA15900862731 /* SimpleHttpApiManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B28442B520CFA15900862731 /* SimpleHttpApiManager.m */; };
-		B28442B920CFA21100862731 /* SimpleHTTPClient.m in Sources */ = {isa = PBXBuildFile; fileRef = B28442B820CFA21100862731 /* SimpleHTTPClient.m */; };
 		B2AE6A9120BFB9B20001E34A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B2AE6A9020BFB9B20001E34A /* AppDelegate.m */; };
 		B2AE6A9420BFB9B20001E34A /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2AE6A9320BFB9B20001E34A /* ViewController.m */; };
 		B2AE6A9720BFB9B20001E34A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B2AE6A9520BFB9B20001E34A /* Main.storyboard */; };
@@ -22,13 +22,13 @@
 
 /* Begin PBXFileReference section */
 		2D0E08FBB67083C192626532 /* Pods-DDHTTPClientDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DDHTTPClientDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DDHTTPClientDemo/Pods-DDHTTPClientDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		53B4E675240BED9D0060B436 /* DDHTTPApiManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDHTTPApiManager.h; sourceTree = "<group>"; };
+		53B4E676240BED9D0060B436 /* DDHTTPApiManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDHTTPApiManager.m; sourceTree = "<group>"; };
+		53B4E67A240BF02B0060B436 /* SimpleHttpApiManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleHttpApiManager.h; sourceTree = "<group>"; };
+		53B4E67C240BF02B0060B436 /* SimpleHttpApiManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleHttpApiManager.m; sourceTree = "<group>"; };
+		53B4E67F240BFA000060B436 /* DDHTTPReachabilityManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DDHTTPReachabilityManager.h; sourceTree = "<group>"; };
+		53B4E680240BFA000060B436 /* DDHTTPReachabilityManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DDHTTPReachabilityManager.m; sourceTree = "<group>"; };
 		963C5F50790D67FF64C559BF /* libPods-DDHTTPClientDemo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-DDHTTPClientDemo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		B28442B020CFA0C700862731 /* DDHttpApiManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDHttpApiManager.h; sourceTree = "<group>"; };
-		B28442B120CFA0C700862731 /* DDHttpApiManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDHttpApiManager.m; sourceTree = "<group>"; };
-		B28442B420CFA15900862731 /* SimpleHttpApiManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SimpleHttpApiManager.h; sourceTree = "<group>"; };
-		B28442B520CFA15900862731 /* SimpleHttpApiManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SimpleHttpApiManager.m; sourceTree = "<group>"; };
-		B28442B720CFA21100862731 /* SimpleHTTPClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SimpleHTTPClient.h; sourceTree = "<group>"; };
-		B28442B820CFA21100862731 /* SimpleHTTPClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SimpleHTTPClient.m; sourceTree = "<group>"; };
 		B2AE6A8C20BFB9B20001E34A /* DDHTTPClientDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DDHTTPClientDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2AE6A8F20BFB9B20001E34A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B2AE6A9020BFB9B20001E34A /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -65,6 +65,15 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		53B4E678240BF02B0060B436 /* Simple */ = {
+			isa = PBXGroup;
+			children = (
+				53B4E67A240BF02B0060B436 /* SimpleHttpApiManager.h */,
+				53B4E67C240BF02B0060B436 /* SimpleHttpApiManager.m */,
+			);
+			path = Simple;
+			sourceTree = "<group>";
+		};
 		5A309F2ACECB29291B994D9F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -73,21 +82,10 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		B28442B320CFA11C00862731 /* Simple */ = {
-			isa = PBXGroup;
-			children = (
-				B28442B420CFA15900862731 /* SimpleHttpApiManager.h */,
-				B28442B520CFA15900862731 /* SimpleHttpApiManager.m */,
-				B28442B720CFA21100862731 /* SimpleHTTPClient.h */,
-				B28442B820CFA21100862731 /* SimpleHTTPClient.m */,
-			);
-			path = Simple;
-			sourceTree = "<group>";
-		};
 		B2AE6A8320BFB9B20001E34A = {
 			isa = PBXGroup;
 			children = (
-				B28442B320CFA11C00862731 /* Simple */,
+				53B4E678240BF02B0060B436 /* Simple */,
 				B2AE6AA520BFBA120001E34A /* DDHTTPClient */,
 				B2AE6A8E20BFB9B20001E34A /* DDHTTPClientDemo */,
 				B2AE6A8D20BFB9B20001E34A /* Products */,
@@ -123,10 +121,12 @@
 		B2AE6AA520BFBA120001E34A /* DDHTTPClient */ = {
 			isa = PBXGroup;
 			children = (
-				B28442B020CFA0C700862731 /* DDHttpApiManager.h */,
-				B28442B120CFA0C700862731 /* DDHttpApiManager.m */,
+				53B4E675240BED9D0060B436 /* DDHTTPApiManager.h */,
+				53B4E676240BED9D0060B436 /* DDHTTPApiManager.m */,
 				B2AE6AA620BFBA120001E34A /* DDHTTPClient.h */,
 				B2AE6AA720BFBA120001E34A /* DDHTTPClient.m */,
+				53B4E67F240BFA000060B436 /* DDHTTPReachabilityManager.h */,
+				53B4E680240BFA000060B436 /* DDHTTPReachabilityManager.m */,
 			);
 			path = DDHTTPClient;
 			sourceTree = "<group>";
@@ -224,13 +224,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B28442B920CFA21100862731 /* SimpleHTTPClient.m in Sources */,
+				53B4E681240BFA000060B436 /* DDHTTPReachabilityManager.m in Sources */,
 				B2AE6AA820BFBA120001E34A /* DDHTTPClient.m in Sources */,
 				B2AE6A9420BFB9B20001E34A /* ViewController.m in Sources */,
-				B28442B620CFA15900862731 /* SimpleHttpApiManager.m in Sources */,
+				53B4E67E240BF02B0060B436 /* SimpleHttpApiManager.m in Sources */,
 				B2AE6A9F20BFB9B20001E34A /* main.m in Sources */,
 				B2AE6A9120BFB9B20001E34A /* AppDelegate.m in Sources */,
-				B28442B220CFA0C700862731 /* DDHttpApiManager.m in Sources */,
+				53B4E677240BED9D0060B436 /* DDHTTPApiManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

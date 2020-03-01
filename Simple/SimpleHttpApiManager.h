@@ -6,7 +6,7 @@
 //  Copyright © 2018年 abiang. All rights reserved.
 //
 
-#import "DDHttpApiManager.h"
+#import "DDHTTPApiManager.h"
 
 @class SimpleHttpApiManager;
 @protocol SimpleHttpApiReformerProtocol <DDHttpApiReformerProtocol>
@@ -14,7 +14,7 @@
 - (NSDictionary *)reformDataWithManager:(SimpleHttpApiManager *)manager;
 @end
 
-@interface SimpleHttpApiManager : DDHttpApiManager<DDHttpApiManagerDataSource>
+@interface SimpleHttpApiManager : DDHTTPApiManager<DDHTTPApiManagerDataSource>
 
 - (NSString *)apiHost;
 - (NSString *)apiPort;

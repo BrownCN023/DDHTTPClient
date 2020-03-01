@@ -7,38 +7,42 @@
 //
 
 #import "ViewController.h"
-#import "SimpleHttpApiManager.h"
+#import "DDHTTPClient.h"
+#import "DDHTTPReachabilityManager.h"
 
-@interface ViewController ()<DDHttpApiManagerDelegate>
+@interface ViewController ()
 
-@property (nonatomic,strong) SimpleHttpApiManager * apiManager;
+@property (nonatomic,strong) DDHTTPTaskBox * taskBox;
 
 @end
 
 @implementation ViewController
 
+- (void)dealloc{
+    [self.taskBox removeAllTask];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
-    self.apiManager = [[SimpleHttpApiManager alloc] init];
-    self.apiManager.delegate = self;
     
-    //...
-    //[self.apiManager get];
-    [self.apiManager post];
-}
-
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-#pragma mark - DDHttpApiManagerDelegate
-- (void)apiManagerDidSuccess:(DDHttpApiManager *)manager{
+    self.taskBox = [DDHTTPTaskBox createTaskBox];
+    NSLog(@"DDHTTPReachabilityManager.sharedManager.networkStatus:%@",@(DDHTTPReachabilityManager.sharedManager.networkStatus));
     
-}
-- (void)apiManagerFailed:(DDHttpApiManager *)manager error:(NSError *)error{
+    DDHTTPRequest * request = DDHTTPClient
+    .createRequest
+    .method(DDHTTP_Method_Get)
+    .url(@"https://unidemo.dcloud.net.cn/api/news")
+    .header(nil)
+    .params(nil)
+    .progress(^(NSProgress *downloadProgress) {
+        NSLog(@"downloadProgress:%@",downloadProgress);
+    }).success(^(NSURLSessionDataTask *task, id response) {
+        NSLog(@"response:%@",response);
+    }).failure(^(NSURLSessionDataTask *task, NSError *error) {
+        NSLog(@"error:%@",error);
+    });
+    
+    [self.taskBox addTask:[DDHTTPClient sendRequest:request]];
     
 }
 

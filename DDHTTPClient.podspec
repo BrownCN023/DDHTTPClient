@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
 
 s.name         = "DDHTTPClient"
-s.version      = "0.0.9"
+s.version      = "0.1.0"
 s.summary      = "AFNetworking HTTP client"
 s.homepage     = "https://github.com/BrownCN023/DDHTTPClient"
 s.license      = { :type => "MIT", :file => "LICENSE" }
