@@ -17,23 +17,20 @@ typedef NS_ENUM(NSInteger, DDHTTPNetworkStatus) {
     DDHTTPNetworkStatusReachableViaWiFi = 2,  //WiFi
 };
 
-@class DDHTTPReachabilityManager;
-@protocol DDHTTPReachabilityManagerDelegate <NSObject>
-@optional
-- (void)ddNetworkManager:(DDHTTPReachabilityManager *)manager reachabilityStatus:(DDHTTPNetworkStatus)status;
-@end
+typedef void (^DDHTTPNetworkStatusHandler)(DDHTTPNetworkStatus status);
 
 @interface DDHTTPReachabilityManager : NSObject
 
-@property (readonly, nonatomic,assign) DDHTTPNetworkStatus networkStatus;  //当前网络的状态
+@property (readonly, nonatomic,assign) DDHTTPNetworkStatus status;  //当前网络的状态
 @property (readonly, nonatomic, assign, getter = isReachable) BOOL reachable; //当前网络是否可用（蜂窝网或WiFi）
 @property (readonly, nonatomic, assign, getter = isReachableViaWWAN) BOOL reachableViaWWAN; //当前网络是否是蜂窝网
 @property (readonly, nonatomic, assign, getter = isReachableViaWiFi) BOOL reachableViaWiFi; //当前网络是否是WiFi
 
 + (DDHTTPReachabilityManager *)sharedManager;
-- (void)addDelegate:(id<DDHTTPReachabilityManagerDelegate>)delegate;
-- (void)removeDelegate:(id<DDHTTPReachabilityManagerDelegate>)delegate;
-- (void)removeAllDelegate;
+
+- (void)addListener:(id)listener handler:(DDHTTPNetworkStatusHandler)handler;
+- (void)removeListener:(id)listener;
+- (void)removeAllListener;
 
 @end
 

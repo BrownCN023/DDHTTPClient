@@ -1,15 +1,20 @@
 //
 //  DDHTTPClient.m
-//  DDToolboxExample
 //
-//  Created by brown on 2018/5/10.
-//  Copyright © 2018年 ABiang. All rights reserved.
+//  Created by liyebiao on 2020/7/15.
 //
 
 #import "DDHTTPClient.h"
+#import <AFNetworking/AFNetworking.h>
+
+#ifdef DEBUG
+#define DDHTTPClientLog(format, ...) printf("-- (DDHTTPClientLog🍄) %s:(%d) --   %s\n\n", [[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, [[NSString stringWithFormat:(format), ##__VA_ARGS__] UTF8String] )
+#else
+#define DDHTTPClientLog(format, ...)
+#endif
+
 
 #pragma mark - DDHTTPUploadModel
-
 @implementation DDHTTPUploadComponent
 
 - (instancetype)initWithFileType:(DDHTTPUploadComponentType)fileType
@@ -47,17 +52,19 @@
 
 
 @interface DDHTTPRequest()
+@property (nonatomic,copy) NSString * httpNotes;
 @property (nonatomic,copy) NSString * httpUrl;
 @property (nonatomic,strong) NSDictionary * httpHeader;
 @property (nonatomic,strong) NSDictionary * httpParams;
 @property (nonatomic,strong) NSArray<DDHTTPUploadComponent *> * httpUploadFiles;
 @property (nonatomic,copy) DDHTTPProgressBlock httpProgress;
 @property (nonatomic,copy) DDHTTPSuccessBlock httpSuccess;
+@property (nonatomic,copy) DDHTTPLogicErrorBlock httpLogicError;
 @property (nonatomic,copy) DDHTTPFailureBlock httpFailure;
 @property (nonatomic,copy) DDHTTPDownloadDestinationBlock httpDownloadDestination;
 @property (nonatomic,copy) DDHTTPDownloadCompletionBlock httpDownloadCompletion;
 @property (nonatomic,copy) DDHTTPManagerConfigBlock httpManagerConfig;
-@property (nonatomic,assign) DDHTTP_Method httpMethod;
+@property (nonatomic,assign) DDHTTPMethod httpMethod;
 @end
 
 
@@ -66,15 +73,19 @@
 @implementation DDHTTPRequest
 
 - (void)dealloc{
-#ifdef DEBUG
-    NSLog(@"---- dealloc %@ ----",[self class]);
-#endif
+    DDHTTPClientLog(@"---- dealloc %@ ----",[self class]);
 }
 
 #pragma mark - Setter
 - (DDHTTPRequest *(^)(NSString *))url{
     return ^(NSString * url){
         self.httpUrl = url;
+        return self;
+    };
+}
+- (DDHTTPRequest * _Nonnull (^)(NSString * _Nonnull))notes{
+    return ^(NSString * notes){
+        self.httpNotes = notes;
         return self;
     };
 }
@@ -121,6 +132,13 @@
     };
 }
 
+- (DDHTTPRequestLogicError)logicError{
+    return ^(DDHTTPLogicErrorBlock callback){
+        self.httpLogicError = callback;
+        return self;
+    };
+}
+
 - (DDHTTPRequestFailure)failure{
     return ^(DDHTTPFailureBlock callback){
         self.httpFailure = callback;
@@ -135,15 +153,15 @@
     };
 }
 
-- (DDHTTPRequest *(^)(void (^)(AFHTTPSessionManager *)))managerConfig{
+- (DDHTTPRequest *(^)(void (^)(AFHTTPSessionManager *)))configSessionManager{
     return ^(void (^config)(AFHTTPSessionManager * manager)){
         self.httpManagerConfig = config;
         return self;
     };
 }
 
-- (DDHTTPRequest *(^)(DDHTTP_Method))method{
-    return ^(DDHTTP_Method m){
+- (DDHTTPRequest *(^)(DDHTTPMethod))method{
+    return ^(DDHTTPMethod m){
         self.httpMethod = m;
         return self;
     };
@@ -163,12 +181,10 @@
     return [[DDHTTPRequest alloc] init];
 }
 
-+ (AFHTTPSessionManager *)createManager
++ (AFHTTPSessionManager *)createSessionManager
 {
     AFHTTPSessionManager * manager = [AFHTTPSessionManager manager];
     manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-    //        manager.requestSerializer = [AFJSONRequestSerializer serializer];
-    //        manager.responseSerializer = [AFHTTPResponseSerializer serializer];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
     manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:
                                                          @"text/html",
@@ -181,45 +197,72 @@
     return manager;
 }
 
++ (void)configSessionManager:(AFHTTPSessionManager *)sessionManager url:(NSString *)url{
+    //...
+}
+
 + (NSURLSessionDataTask *)sendRequest:(DDHTTPRequest *)req
 {
-    AFHTTPSessionManager * manager = [self.class createManager];
+    if(![self checkNetwork:^(BOOL suc, NSError * _Nonnull error) {
+        req.httpFailure(nil,error);
+    }]){
+        return nil;
+    }
+    AFHTTPSessionManager * manager = [self.class createSessionManager];
+    [self.class configSessionManager:manager url:req.httpUrl];
+    
     if(req.httpManagerConfig){
         req.httpManagerConfig(manager);
     }
     return [self taskWithMethod:req.httpMethod
-                              manager:manager
-                                  url:req.httpUrl
-                              headers:req.httpHeader
-                               params:req.httpParams
-                             progress:req.httpProgress
-                              success:req.httpSuccess
-                              failure:req.httpFailure];
+                        manager:manager
+                          notes:req.httpNotes
+                            url:req.httpUrl
+                        headers:req.httpHeader
+                         params:req.httpParams
+                       progress:req.httpProgress
+                        success:req.httpSuccess
+                     logicError:req.httpLogicError
+                        failure:req.httpFailure];
 }
 
 + (NSURLSessionDataTask *)sendUploadRequest:(DDHTTPRequest *)req
 {
-    AFHTTPSessionManager * manager = [self.class createManager];
+    if(![self checkNetwork:^(BOOL suc, NSError * _Nonnull error) {
+        req.httpFailure(nil,error);
+    }]){
+        return nil;
+    }
+
+    AFHTTPSessionManager * manager = [self.class createSessionManager];
     if(req.httpManagerConfig){
         req.httpManagerConfig(manager);
     }
     return [self uploadWithManager:manager
+                             notes:req.httpNotes
                                url:req.httpUrl
                            headers:req.httpHeader
                             params:req.httpParams
                        uploadfiles:req.httpUploadFiles
                           progress:req.httpProgress
                            success:req.httpSuccess
+                        logicError:req.httpLogicError
                            failure:req.httpFailure];
 }
 
 + (NSURLSessionDownloadTask *)sendDownloadRequest:(DDHTTPRequest *)req
 {
-    AFHTTPSessionManager * manager = [self.class createManager];
+    if(![self checkNetwork:^(BOOL suc, NSError * _Nonnull error) {
+        req.httpFailure(nil,error);
+    }]){
+        return nil;
+    }
+    AFHTTPSessionManager * manager = [self.class createSessionManager];
     if(req.httpManagerConfig){
         req.httpManagerConfig(manager);
     }
     return [self downloadWithManager:manager
+                               notes:req.httpNotes
                                  url:req.httpUrl
                              headers:req.httpHeader
                          destination:req.httpDownloadDestination
@@ -228,79 +271,95 @@
 }
 
 
++ (BOOL)checkNetwork:(void (^)(BOOL suc,NSError * error))completion{
+    BOOL suc = DDHTTPReachabilityManager.sharedManager.isReachable;
+    
+    if(completion){
+        if(suc){
+            completion(suc,nil);
+        }else{
+            NSError * msgError = [NSError errorWithDomain:NSLocalizedDescriptionKey code:NSURLErrorNetworkConnectionLost userInfo:@{ NSLocalizedDescriptionKey : @"error network connection lost"}];
+            completion(suc,msgError);
+        }
+    }
+    return suc;
+}
 
 
 
 
 
-
-
-+ (NSURLSessionDataTask *)taskWithMethod:(DDHTTP_Method)method
++ (NSURLSessionDataTask *)taskWithMethod:(DDHTTPMethod)method
                                  manager:(AFHTTPSessionManager *)manager
+                                   notes:(NSString *)notes
                                      url:(NSString *)url
                                  headers:(NSDictionary *)headers
                                   params:(NSDictionary *)params
                                 progress:(DDHTTPProgressBlock)progress
                                  success:(DDHTTPSuccessBlock)success
+                              logicError:(DDHTTPLogicErrorBlock)logicError
                                  failure:(DDHTTPFailureBlock)failure
 {
-    
-    [headers enumerateKeysAndObjectsUsingBlock:^(NSString *  _Nonnull key, NSString *  _Nonnull obj, BOOL * _Nonnull stop) {
-        [manager.requestSerializer setValue:obj forHTTPHeaderField:key];
-    }];
-    
     switch (method) {
-            case DDHTTP_Method_Get:
+            case DDHTTPMethodGet:
         {
             return [manager GET:url
                      parameters:params
+                        headers:headers
                        progress:progress
-                        success:success
-                        failure:failure];
+                        success:[self handleSuccess:success failure:failure logicError:logicError notes:notes url:url method:@"GET" headers:headers params:params manager:manager]
+                        failure:[self handleFailure:failure notes:notes url:url method:@"GET" headers:headers params:params manager:manager]];
         }
             break;
-            case DDHTTP_Method_Post:
+            case DDHTTPMethodPost:
         {
             return [manager POST:url
                       parameters:params
+                         headers:headers
                         progress:progress
-                         success:success
-                         failure:failure];
+                         success:[self handleSuccess:success failure:failure logicError:logicError notes:notes url:url method:@"POST" headers:headers params:params manager:manager]
+                         failure:[self handleFailure:failure notes:notes url:url method:@"POST" headers:headers params:params manager:manager]];
         }
             break;
-            case DDHTTP_Method_Head:
+            case DDHTTPMethodHead:
         {
             return [manager HEAD:url
                       parameters:params
+                         headers:headers
                          success:^(NSURLSessionDataTask * _Nonnull task) {
-                             if(success){
-                                 success(task,nil);
-                             }
-                         } failure:failure];
+                if(success){
+                    success(task,nil);
+                    //[self handleSuccess:success url:url headers:headers params:params]
+                }
+            }
+                         failure:[self handleFailure:failure notes:notes url:url method:@"HEAD" headers:headers params:params manager:manager]];
         }
             break;
-            case DDHTTP_Method_Put:
+            case DDHTTPMethodPut:
         {
             return [manager PUT:url
                      parameters:params
-                        success:success
-                        failure:failure];
+                        headers:headers
+                        success:[self handleSuccess:success failure:failure logicError:logicError notes:notes url:url method:@"PUT" headers:headers params:params manager:manager]
+                        failure:[self handleFailure:failure notes:notes url:url method:@"PUT" headers:headers params:params manager:manager]];
         }
             break;
-            case DDHTTP_Method_Patch:
+            case DDHTTPMethodPatch:
         {
             return [manager PATCH:url
                        parameters:params
-                          success:success
-                          failure:failure];
+                          headers:headers
+                          success:[self handleSuccess:success failure:failure logicError:logicError notes:notes url:url method:@"PATCH" headers:headers params:params manager:manager]
+                          failure:[self handleFailure:failure notes:notes url:url method:@"PATCH" headers:headers params:params manager:manager]];
         }
             break;
-            case DDHTTP_Method_Delete:
+            case DDHTTPMethodDelete:
         {
             return [manager DELETE:url
-                     parameters:params
-                        success:success
-                        failure:failure];
+                        parameters:params
+                           headers:headers
+                           success:[self handleSuccess:success failure:failure logicError:logicError notes:notes url:url method:@"DELETE" headers:headers params:params manager:manager]
+                           failure:[self handleFailure:failure notes:notes url:url method:@"DELETE" headers:headers params:params manager:manager]];
         }
             break;
             
@@ -311,6 +370,7 @@
 }
 
 + (NSURLSessionDownloadTask *)downloadWithManager:(AFHTTPSessionManager *)manager
+                                            notes:(NSString *)notes
                                               url:(NSString *)url
                                           headers:(NSDictionary *)headers
                                       destination:(DDHTTPDownloadDestinationBlock)destination
@@ -331,19 +391,19 @@
 }
 
 + (NSURLSessionDataTask *)uploadWithManager:(AFHTTPSessionManager *)manager
+                                      notes:(NSString *)notes
                                         url:(NSString *)url
                                     headers:(NSDictionary *)headers
                                      params:(NSDictionary *)params
                                 uploadfiles:(NSArray<DDHTTPUploadComponent *> *)uploadFiles
                                    progress:(DDHTTPProgressBlock)progress
                                     success:(DDHTTPSuccessBlock)success
+                                 logicError:(DDHTTPLogicErrorBlock)logicError
                                     failure:(DDHTTPFailureBlock)failure
 {
-    [headers enumerateKeysAndObjectsUsingBlock:^(NSString *  _Nonnull key, NSString *  _Nonnull obj, BOOL * _Nonnull stop) {
-        [manager.requestSerializer setValue:obj forHTTPHeaderField:key];
-    }];
     return [manager POST:url
               parameters:params
+                 headers:headers
 constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
         [uploadFiles enumerateObjectsUsingBlock:^(DDHTTPUploadComponent * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             if(obj.fileType == DDHTTPUploadComponentTypeData){
@@ -357,9 +417,52 @@ constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
                 }
             }
         }];
-    }  progress:progress
-        success:success
-        failure:failure];
+    }
+                progress:progress
+                 success:[self handleSuccess:success failure:failure logicError:logicError notes:notes url:url method:@"UPLOAD" headers:headers params:params manager:manager]
+                 failure:[self handleFailure:failure notes:notes url:url method:@"UPLOAD" headers:headers params:params manager:manager]];
+}
+
++ (DDHTTPSuccessBlock)handleSuccess:(DDHTTPSuccessBlock)success
+                            failure:(DDHTTPFailureBlock)failure
+                         logicError:(DDHTTPLogicErrorBlock _Nullable)logicError
+                              notes:(NSString *)notes
+                                url:(NSString *)url
+                             method:(NSString *)method
+                            headers:(NSDictionary *)headers
+                             params:(NSDictionary *)params
+                            manager:(AFHTTPSessionManager *)manager{
+    return ^(NSURLSessionDataTask * task, id _Nullable response) {
+        DDHTTPClientLog(@"🍄🍄🍄 http success.. \nurl:%@\nheaders:%@\nparams:%@\nresponse:%@",url,[self mergeHeaders:headers manager:manager],params,response);
+        if(success){
+            success(task,response);
+        }
+        [manager.session finishTasksAndInvalidate];
+    };
+}
+
++ (DDHTTPFailureBlock)handleFailure:(DDHTTPFailureBlock)failure
+                              notes:(NSString *)notes
+                                url:(NSString *)url
+                             method:(NSString *)method
+                            headers:(NSDictionary *)headers
+                             params:(NSDictionary *)params
+                            manager:(AFHTTPSessionManager *)manager{
+    return ^(NSURLSessionDataTask * task, NSError *error) {
+        DDHTTPClientLog(@"🍄🍄🍄 http failure.. \nurl:%@\nheaders:%@\nparams:%@\nerror:%@",url,[self mergeHeaders:headers manager:manager],params,error);
+        if(failure){
+            failure(task,error);
+        }
+        [manager.session finishTasksAndInvalidate];
+    };
+}
+
++ (NSDictionary *)mergeHeaders:(NSDictionary *)headers manager:(AFHTTPSessionManager *)manager{
+    
+    NSMutableDictionary * allHeaders = [NSMutableDictionary new];
+    [allHeaders setValuesForKeysWithDictionary:manager.requestSerializer.HTTPRequestHeaders];
+    [allHeaders setValuesForKeysWithDictionary:headers];
+    return allHeaders;
 }
 
 @end
@@ -399,4 +502,29 @@ constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
     [_delegates removeAllObjects];
 }
 
+@end
+
+
+@implementation NSURLSessionTask(taskBox)
+- (void)addToTaskBox:(DDHTTPTaskBox *)taskBox{
+    [taskBox addTask:self];
+}
+@end
+
+@implementation NSURLSessionDataTask(taskBox)
+- (void)addToTaskBox:(DDHTTPTaskBox *)taskBox{
+    [taskBox addTask:self];
+}
+@end
+
+@implementation NSURLSessionUploadTask(taskBox)
+- (void)addToTaskBox:(DDHTTPTaskBox *)taskBox{
+    [taskBox addTask:self];
+}
+@end
+
+@implementation NSURLSessionDownloadTask(taskBox)
+- (void)addToTaskBox:(DDHTTPTaskBox *)taskBox{
+    [taskBox addTask:self];
+}
 @end

@@ -26,11 +26,12 @@
     [super viewDidLoad];
     
     self.taskBox = [DDHTTPTaskBox createTaskBox];
-    NSLog(@"DDHTTPReachabilityManager.sharedManager.networkStatus:%@",@(DDHTTPReachabilityManager.sharedManager.networkStatus));
+    NSLog(@"DDHTTPReachabilityManager.sharedManager.networkStatus:%@",@(DDHTTPReachabilityManager.sharedManager.status));
     
     DDHTTPRequest * request = DDHTTPClient
     .createRequest
-    .method(DDHTTP_Method_Get)
+    .notes(@"dcloud-api")
+    .method(DDHTTPMethodGet)
     .url(@"https://unidemo.dcloud.net.cn/api/news")
     .header(nil)
     .params(nil)

@@ -9,15 +9,16 @@
 #import "DDHTTPReachabilityManager.h"
 #import <AFNetworking/AFNetworking.h>
 
-@interface DDHTTPReachabilityManager(){
-    NSHashTable * _delegates;
-}
-@property (nonatomic,assign) DDHTTPNetworkStatus networkStatus;
+@interface DDHTTPReachabilityManager()
 @property (nonatomic,weak) AFNetworkReachabilityManager * manager;
-
+@property (nonatomic,strong) NSMapTable<id,id> * handlerContainer;
 @end
 
 @implementation DDHTTPReachabilityManager
+
++ (void)load{
+    [DDHTTPReachabilityManager sharedManager];
+}
 
 + (DDHTTPReachabilityManager *)sharedManager{
     static DDHTTPReachabilityManager * manager = nil;
@@ -38,9 +39,7 @@
 }
 
 - (void)setupInit{
-    _delegates = [NSHashTable weakObjectsHashTable];
-    __weak typeof(self) weakself = self;
-    
+    self.handlerContainer = [NSMapTable weakToStrongObjectsMapTable];
     self.manager = [AFNetworkReachabilityManager sharedManager];
     [_manager startMonitoring];
     [_manager setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
@@ -77,17 +76,17 @@
             }
                 break;
         }
-        NSArray * allDelegate = _delegates.allObjects;
-        [allDelegate enumerateObjectsUsingBlock:^(id  _Nonnull delegate, NSUInteger idx, BOOL * _Nonnull stop) {
-            if(delegate && [delegate respondsToSelector:@selector(ddNetworkManager:reachabilityStatus:)]){
-                [delegate ddNetworkManager:weakself reachabilityStatus:weakself.networkStatus];
-            }
-        }];
+        NSEnumerator * enumerator = self.handlerContainer.objectEnumerator;
+        id obj = nil;
+        while (obj = [enumerator nextObject]) {
+            DDHTTPNetworkStatusHandler handler = obj;
+            handler((DDHTTPNetworkStatus)status);
+        }
     }];
     
 }
 
-- (DDHTTPNetworkStatus)networkStatus{
+- (DDHTTPNetworkStatus)status{
     return (DDHTTPNetworkStatus)_manager.networkReachabilityStatus;
 }
 - (BOOL)isReachable{
@@ -99,14 +98,20 @@
 - (BOOL)isReachableViaWiFi{
     return _manager.isReachableViaWiFi;
 }
-- (void)addDelegate:(id<DDHTTPReachabilityManagerDelegate>)delegate{
-    [_delegates addObject:delegate];
+
+- (void)addListener:(id)listener handler:(DDHTTPNetworkStatusHandler)handler{
+    if(listener){
+        [self.handlerContainer setObject:handler forKey:listener];
+    }
 }
-- (void)removeDelegate:(id<DDHTTPReachabilityManagerDelegate>)delegate{
-    [_delegates removeObject:delegate];
+- (void)removeListener:(id)listener{
+    if(listener){
+        [self.handlerContainer removeObjectForKey:listener];
+    }
 }
-- (void)removeAllDelegate{
-    [_delegates removeAllObjects];
+- (void)removeAllListener{
+    [self.handlerContainer removeAllObjects];
 }
+
 
 @end
