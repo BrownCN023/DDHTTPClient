@@ -14,7 +14,7 @@ s.summary      = "AFNetworking HTTP client"
 s.homepage     = "https://github.com/BrownCN023/DDHTTPClient"
 s.license      = { :type => "MIT", :file => "LICENSE" }
 s.author       = { "liyebiao1990" => "347991555@qq.com" }
-s.platform     = :ios, "8.0"
+s.platform     = :ios, "9.0"
 s.source       = { :git => "https://github.com/BrownCN023/DDHTTPClient.git", :tag => s.version }
 s.source_files = "DDHTTPClient/**/*.{h,m}"
 s.requires_arc = true
